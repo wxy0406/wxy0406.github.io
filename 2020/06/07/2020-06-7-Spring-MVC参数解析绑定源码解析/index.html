@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon16.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring MVC," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="​        HandlerMethodArgumentResolver是方法参数解析器接口，这个接口是SpringMVC参数解析绑定的核心接口。不同的参数类型绑定都是通过实现这个接口来实现。也可以通过实现这个接口来自定义参数解析器。这个接口中有如下两个方法： 1234567891011&#x2F;** * 该解析器是否支持parameter参数的解析 *&#x2F;boolean suppo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring MVC参数解析绑定源码解析">
+<meta property="og:url" content="http://yoursite.com/2020/06/07/2020-06-7-Spring-MVC%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90%E7%BB%91%E5%AE%9A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="王晓扬">
+<meta property="og:description" content="​        HandlerMethodArgumentResolver是方法参数解析器接口，这个接口是SpringMVC参数解析绑定的核心接口。不同的参数类型绑定都是通过实现这个接口来实现。也可以通过实现这个接口来自定义参数解析器。这个接口中有如下两个方法： 1234567891011&#x2F;** * 该解析器是否支持parameter参数的解析 *&#x2F;boolean suppo">
+<meta property="article:published_time" content="2020-06-07T13:05:15.000Z">
+<meta property="article:modified_time" content="2020-07-16T14:06:09.141Z">
+<meta property="article:author" content="我">
+<meta property="article:tag" content="Spring MVC">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/07/2020-06-7-Spring-MVC参数解析绑定源码解析/"/>
+
+
+
+
+
+  <title>Spring MVC参数解析绑定源码解析 | 王晓扬</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	
+	<a href="https://github.com/wxy0406" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">王晓扬</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">记录成长</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/07/2020-06-7-Spring-MVC%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90%E7%BB%91%E5%AE%9A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="我">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="王晓扬">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring MVC参数解析绑定源码解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-07T21:05:15+08:00">
+                2020-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/06/07/2020-06-7-Spring-MVC%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90%E7%BB%91%E5%AE%9A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/06/07/2020-06-7-Spring-MVC%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90%E7%BB%91%E5%AE%9A%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.5k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>​        HandlerMethodArgumentResolver是方法参数解析器接口，这个接口是SpringMVC参数解析绑定的核心接口。不同的参数类型绑定都是通过实现这个接口来实现。也可以通过实现这个接口来自定义参数解析器。这个接口中有如下两个方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * 该解析器是否支持parameter参数的解析</span><br><span class="line"> *&#x2F;</span><br><span class="line">boolean supportsParameter(MethodParameter parameter);</span><br><span class="line"></span><br><span class="line">&#x2F;**</span><br><span class="line"> * 将方法参数从给定请求(webRequest)解析为参数值并返回</span><br><span class="line"> *&#x2F;</span><br><span class="line">@Nullable</span><br><span class="line">Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,</span><br><span class="line">      NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception;</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><ul>
+<li>RequestMappingHandlerAdapter类的afterPropertiesSet方法初始化相关方法参数解析器。代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void afterPropertiesSet() &#123;</span><br><span class="line">   &#x2F;&#x2F; Do this first, it may add ResponseBody advice beans</span><br><span class="line">   initControllerAdviceCache();</span><br><span class="line">   if (this.argumentResolvers &#x3D;&#x3D; null) &#123;</span><br><span class="line">      &#x2F;&#x2F;初始化SpringMVC默认的方法参数解析器，并添加至argumentResolvers（HandlerMethodArgumentResolverComposite）</span><br><span class="line">      List&lt;HandlerMethodArgumentResolver&gt; resolvers &#x3D; getDefaultArgumentResolvers();</span><br><span class="line">      this.argumentResolvers &#x3D; new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);</span><br><span class="line">   &#125;</span><br><span class="line">   if (this.initBinderArgumentResolvers &#x3D;&#x3D; null) &#123;</span><br><span class="line">      &#x2F;&#x2F;初始化SpringMVC默认的初始化绑定器(@InitBinder)参数解析器，并添加至initBinderArgumentResolvers（HandlerMethodArgumentResolverComposite）</span><br><span class="line">      List&lt;HandlerMethodArgumentResolver&gt; resolvers &#x3D; getDefaultInitBinderArgumentResolvers();</span><br><span class="line">      this.initBinderArgumentResolvers &#x3D; new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);</span><br><span class="line">   &#125;</span><br><span class="line">   if (this.returnValueHandlers &#x3D;&#x3D; null) &#123;</span><br><span class="line">      &#x2F;&#x2F;获取默认的方法返回值解析器</span><br><span class="line">      List&lt;HandlerMethodReturnValueHandler&gt; handlers &#x3D; getDefaultReturnValueHandlers();</span><br><span class="line">      this.returnValueHandlers &#x3D; new HandlerMethodReturnValueHandlerComposite().addHandlers(handlers);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>现在我们进入getDefaultArgumentResolvers方法，代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * 默认的参数解析，创建了默认的24个参数解析器，并添加至resolvers</span><br><span class="line"> *&#x2F;</span><br><span class="line">private List&lt;HandlerMethodArgumentResolver&gt; getDefaultArgumentResolvers() &#123;</span><br><span class="line">   List&lt;HandlerMethodArgumentResolver&gt; resolvers &#x3D; new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">   &#x2F;&#x2F; Annotation-based argument resolution</span><br><span class="line">   resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), false));</span><br><span class="line">   resolvers.add(new RequestParamMapMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new PathVariableMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new PathVariableMapMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new MatrixVariableMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new MatrixVariableMapMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new ServletModelAttributeMethodProcessor(false));</span><br><span class="line">   resolvers.add(new RequestResponseBodyMethodProcessor(getMessageConverters(), this.requestResponseBodyAdvice));</span><br><span class="line">   resolvers.add(new RequestPartMethodArgumentResolver(getMessageConverters(), this.requestResponseBodyAdvice));</span><br><span class="line">   resolvers.add(new RequestHeaderMethodArgumentResolver(getBeanFactory()));</span><br><span class="line">   resolvers.add(new RequestHeaderMapMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new ServletCookieValueMethodArgumentResolver(getBeanFactory()));</span><br><span class="line">   resolvers.add(new ExpressionValueMethodArgumentResolver(getBeanFactory()));</span><br><span class="line">   resolvers.add(new SessionAttributeMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new RequestAttributeMethodArgumentResolver());</span><br><span class="line"></span><br><span class="line">   &#x2F;&#x2F; Type-based argument resolution</span><br><span class="line">   resolvers.add(new ServletRequestMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new ServletResponseMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new HttpEntityMethodProcessor(getMessageConverters(), this.requestResponseBodyAdvice));</span><br><span class="line">   resolvers.add(new RedirectAttributesMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new ModelMethodProcessor());</span><br><span class="line">   resolvers.add(new MapMethodProcessor());</span><br><span class="line">   resolvers.add(new ErrorsMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new SessionStatusMethodArgumentResolver());</span><br><span class="line">   resolvers.add(new UriComponentsBuilderMethodArgumentResolver());</span><br><span class="line"></span><br><span class="line">   &#x2F;&#x2F; Custom arguments</span><br><span class="line">   if (getCustomArgumentResolvers() !&#x3D; null) &#123;</span><br><span class="line">      resolvers.addAll(getCustomArgumentResolvers());</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#x2F;&#x2F; Catch-all</span><br><span class="line">   resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), true));</span><br><span class="line">   resolvers.add(new ServletModelAttributeMethodProcessor(true));</span><br><span class="line"></span><br><span class="line">   return resolvers;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数解析器添加至HandlerMethodArgumentResolverComposite这个类，这个也是实现了HandlerMethodArgumentResolver接口。这里运用涉及模式中的composite模式（组合模式），SpringMVC中，所有请求的参数解析都是进入HandlerMethodArgumentResolverComposite类来完成的。它有两个成员变量，如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;它的元素在RequestMappingHandlerAdapter类的afterPropertiesSet方法中被添加，存放的是SpringMVC一些默认的HandlerMethodArgumentResolver参数解析器</span><br><span class="line">private final List&lt;HandlerMethodArgumentResolver&gt; argumentResolvers &#x3D; new LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;存放已经解析过的参数，已经对应的HandlerMethodArgumentResolver解析器。加快查找过程</span><br><span class="line">private final Map&lt;MethodParameter, HandlerMethodArgumentResolver&gt; argumentResolverCache &#x3D;</span><br><span class="line">      new ConcurrentHashMap&lt;&gt;(256);</span><br></pre></td></tr></table></figure>
+
+<h3 id="绑定过程"><a href="#绑定过程" class="headerlink" title="绑定过程"></a>绑定过程</h3><p>先看一个简单参数绑定，有如下Controller和请求,代码如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@Controller</span><br><span class="line">@RequestMapping(&quot;&#x2F;ParameterBind&quot;)</span><br><span class="line">public class ParameterBindTestController &#123;</span><br><span class="line">	@ResponseBody</span><br><span class="line">	@RequestMapping(&quot;&#x2F;test1&quot;)</span><br><span class="line">	public String test1(int id) &#123;</span><br><span class="line">		System.out.println(id);</span><br><span class="line">		return &quot;test1&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>请求进入DispatcherServlet的doDispatch后，获取HandlerMethod。然后根据HandlerMethod来确认HandlerApapter，确认后执行HandlerAdapter的handle方法。这里确认HandlerApater为RequestMappingHandlerAdapter，在执行handlerMethod之前，需要处理参数的绑定。</li>
+<li>执行HandlerAdapter的handler方法后，进入RequestMappingHandlerAdapter的invokeHandlerMethod方法</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">@Nullable</span><br><span class="line">protected ModelAndView invokeHandlerMethod(HttpServletRequest request,</span><br><span class="line">      HttpServletResponse response, HandlerMethod handlerMethod) throws Exception &#123;</span><br><span class="line"></span><br><span class="line">   ServletWebRequest webRequest &#x3D; new ServletWebRequest(request, response);</span><br><span class="line">   try &#123;</span><br><span class="line">      WebDataBinderFactory binderFactory &#x3D; getDataBinderFactory(handlerMethod);</span><br><span class="line">      ModelFactory modelFactory &#x3D; getModelFactory(handlerMethod, binderFactory);</span><br><span class="line">      &#x2F;&#x2F;根据handlerMethod和binderFactory创建一个ServletInvocableHandlerMethod。后续把请求直接交给ServletInvocableHandlerMethod执行。</span><br><span class="line">      &#x2F;&#x2F;createRequestMappingMethod方法比较简单，把之前RequestMappingHandlerAdapter初始化的argumentResolvers和returnValueHandlers添加至ServletInvocableHandlerMethod中</span><br><span class="line">      ServletInvocableHandlerMethod invocableMethod &#x3D; createInvocableHandlerMethod(handlerMethod);</span><br><span class="line">      if (this.argumentResolvers !&#x3D; null) &#123;</span><br><span class="line">         invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);</span><br><span class="line">      &#125;</span><br><span class="line">      if (this.returnValueHandlers !&#x3D; null) &#123;</span><br><span class="line">         invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);</span><br><span class="line">      &#125;</span><br><span class="line">      invocableMethod.setDataBinderFactory(binderFactory);</span><br><span class="line">      invocableMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);</span><br><span class="line"></span><br><span class="line">      ModelAndViewContainer mavContainer &#x3D; new ModelAndViewContainer();</span><br><span class="line">      mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));</span><br><span class="line">      modelFactory.initModel(webRequest, mavContainer, invocableMethod);</span><br><span class="line">      mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);</span><br><span class="line"></span><br><span class="line">      AsyncWebRequest asyncWebRequest &#x3D; WebAsyncUtils.createAsyncWebRequest(request, response);</span><br><span class="line">      asyncWebRequest.setTimeout(this.asyncRequestTimeout);</span><br><span class="line"></span><br><span class="line">      WebAsyncManager asyncManager &#x3D; WebAsyncUtils.getAsyncManager(request);</span><br><span class="line">      asyncManager.setTaskExecutor(this.taskExecutor);</span><br><span class="line">      asyncManager.setAsyncWebRequest(asyncWebRequest);</span><br><span class="line">      asyncManager.registerCallableInterceptors(this.callableInterceptors);</span><br><span class="line">      asyncManager.registerDeferredResultInterceptors(this.deferredResultInterceptors);</span><br><span class="line"></span><br><span class="line">      if (asyncManager.hasConcurrentResult()) &#123;</span><br><span class="line">         Object result &#x3D; asyncManager.getConcurrentResult();</span><br><span class="line">         mavContainer &#x3D; (ModelAndViewContainer) asyncManager.getConcurrentResultContext()[0];</span><br><span class="line">         asyncManager.clearConcurrentResult();</span><br><span class="line">         if (logger.isDebugEnabled()) &#123;</span><br><span class="line">            logger.debug(&quot;Found concurrent result value [&quot; + result + &quot;]&quot;);</span><br><span class="line">         &#125;</span><br><span class="line">         invocableMethod &#x3D; invocableMethod.wrapConcurrentResult(result);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      invocableMethod.invokeAndHandle(webRequest, mavContainer);</span><br><span class="line">      if (asyncManager.isConcurrentHandlingStarted()) &#123;</span><br><span class="line">         return null;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      return getModelAndView(mavContainer, modelFactory, webRequest);</span><br><span class="line">   &#125;</span><br><span class="line">   finally &#123;</span><br><span class="line">      webRequest.requestCompleted();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>然后进入invokeAndHanldle方法，然后进入invokeForRequest方法，这个方法的职责是从request中解析出HandlerMethod方法所需要的参数，然后通过反射调用HandlerMethod中的method。代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@Nullable</span><br><span class="line">public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,</span><br><span class="line">		Object... providedArgs) throws Exception &#123;</span><br><span class="line">	&#x2F;&#x2F;从request中解析出HandlerMethod方法所需要的参数，并返回Object[]</span><br><span class="line">	Object[] args &#x3D; getMethodArgumentValues(request, mavContainer, providedArgs);</span><br><span class="line">	if (logger.isTraceEnabled()) &#123;</span><br><span class="line">		logger.trace(&quot;Invoking &#39;&quot; + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +</span><br><span class="line">				&quot;&#39; with arguments &quot; + Arrays.toString(args));</span><br><span class="line">	&#125;</span><br><span class="line">	&#x2F;&#x2F;通过反射执行HandleMethod中的method，方法参数为args。并返回方法执行的返回值</span><br><span class="line">	Object returnValue &#x3D; doInvoke(args);</span><br><span class="line">	if (logger.isTraceEnabled()) &#123;</span><br><span class="line">		logger.trace(&quot;Method [&quot; + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +</span><br><span class="line">				&quot;] returned [&quot; + returnValue + &quot;]&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">	return returnValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>直接进入getMethodArgumentValues方法看看其过程，代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line">* 获取当前请求的方法参数值。</span><br><span class="line">*&#x2F;</span><br><span class="line">private Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,</span><br><span class="line">      Object... providedArgs) throws Exception &#123;</span><br><span class="line">   &#x2F;&#x2F;获取方法参数数组</span><br><span class="line">   MethodParameter[] parameters &#x3D; getMethodParameters();</span><br><span class="line">   &#x2F;&#x2F;创建一个参数数组，保存从request解析出的方法参数</span><br><span class="line">   Object[] args &#x3D; new Object[parameters.length];</span><br><span class="line">   for (int i &#x3D; 0; i &lt; parameters.length; i++) &#123;</span><br><span class="line">      MethodParameter parameter &#x3D; parameters[i];</span><br><span class="line">      parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);</span><br><span class="line">      args[i] &#x3D; resolveProvidedArgument(parameter, providedArgs);</span><br><span class="line">      if (args[i] !&#x3D; null) &#123;</span><br><span class="line">         continue;</span><br><span class="line">      &#125;</span><br><span class="line">      &#x2F;&#x2F;判断之前RequestMappingHandlerAdapter初始化的那24个HandlerMethodArgumentResolver（参数解析器），是否存在支持该参数解析的解析器</span><br><span class="line"></span><br><span class="line">      if (this.argumentResolvers.supportsParameter(parameter)) &#123;</span><br><span class="line">         try &#123;</span><br><span class="line">            args[i] &#x3D; this.argumentResolvers.resolveArgument(</span><br><span class="line">                  parameter, mavContainer, request, this.dataBinderFactory);</span><br><span class="line">            continue;</span><br><span class="line">         &#125;</span><br><span class="line">         catch (Exception ex) &#123;</span><br><span class="line">            if (logger.isDebugEnabled()) &#123;</span><br><span class="line">               logger.debug(getArgumentResolutionErrorMessage(&quot;Failed to resolve&quot;, i), ex);</span><br><span class="line">            &#125;</span><br><span class="line">            throw ex;</span><br><span class="line">         &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      if (args[i] &#x3D;&#x3D; null) &#123;</span><br><span class="line">         throw new IllegalStateException(&quot;Could not resolve method parameter at index &quot; +</span><br><span class="line">               parameter.getParameterIndex() + &quot; in &quot; + parameter.getExecutable().toGenericString() +</span><br><span class="line">               &quot;: &quot; + getArgumentResolutionErrorMessage(&quot;No suitable resolver for&quot;, i));</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   return args;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>然后进入HandlerMethodArgumentResolverComposite的resolveArgument方法，根据前面入参的封装对象MethodParameter作为参数，获取该参数对应的 Resolver（解析器），然后调用对应的 Resolver（解析器）的 resolveArgument方法对入参进行解析。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">@Nullable</span><br><span class="line">public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,</span><br><span class="line">      NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception &#123;</span><br><span class="line"></span><br><span class="line">   HandlerMethodArgumentResolver resolver &#x3D; getArgumentResolver(parameter);</span><br><span class="line">   if (resolver &#x3D;&#x3D; null) &#123;</span><br><span class="line">      throw new IllegalArgumentException(&quot;Unknown parameter type [&quot; + parameter.getParameterType().getName() + &quot;]&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">   return resolver.resolveArgument(parameter, mavContainer, webRequest, binderFactory);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+	<div>
+	  
+		<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+	  
+	</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-MVC/" rel="tag"><i class="fa fa-tag"></i> Spring MVC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/01/Spring%20MVC%E4%B8%AD%E5%A4%AE%E5%A4%84%E7%90%86%E5%99%A8%E6%A0%B8%E5%BF%83%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" rel="next" title="Spring MVC中央处理器核心源码解析">
+                <i class="fa fa-chevron-left"></i> Spring MVC中央处理器核心源码解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="我" />
+            
+              <p class="site-author-name" itemprop="name">我</p>
+              <p class="site-description motion-element" itemprop="description">啦啦啦</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/wxy0406" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">1.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#绑定过程"><span class="nav-number">2.</span> <span class="nav-text">绑定过程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-star"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">我</span>
+
+  <!--
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">28.1k</span>
+  -->
+</div>
+
+<div class="powered-by">
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+
+
+
+  <!--<div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>-->
+
+
+
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共28.1k字</span>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'Fg57LLgR3MXrqtzqviS9hemK-gzGzoHsz',
+        appKey: 'GtpaP9Ui2yPwPdfb2Di5xNbV',
+        placeholder: '来都来了，不撩一句嘛~',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+	
+	
+	<!-- 页面点击小红心 -->
+	
+		<script type="text/javascript" src="/js/src/clicklove.js"></script>
+	
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"right","width":200,"height":400,"hOffset":20,"vOffset":50},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
